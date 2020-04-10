@@ -34,11 +34,15 @@ This repository contains code supported on the following installation:
 
 The files included in this directory have to be included in the GAAS project we have downloaded before. There are new files and there are files that have been changed. Take care to have the new files instead the older ones. 
 
+This contains the main files to run the drone simulation. In commander.py there is the rute that the drone will take. This file can be modified depending on the desire of the user. 
+
 ## listener
 
 This directory doesn't need to be downloaded in an exact directory, but there is a file which is mandatory to put the propertly path of the Firmware in the catkin workspace. 
 
 * Modify the file **listener.cc** in order to have the correct path in your environment. 
+
+This contains the functions to read the data of each sonar sensor. Depending on the distance 
 
 
 
