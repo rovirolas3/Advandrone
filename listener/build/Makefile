@@ -56,17 +56,6 @@ CMAKE_BINARY_DIR = /home/miguel/listener/build
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
-
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-
-.PHONY : rebuild_cache/fast
-
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
@@ -77,6 +66,17 @@ edit_cache:
 edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
+
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/usr/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+
+.PHONY : rebuild_cache/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -123,6 +123,19 @@ listener/fast:
 	$(MAKE) -f CMakeFiles/listener.dir/build.make CMakeFiles/listener.dir/build
 .PHONY : listener/fast
 
+#=============================================================================
+# Target rules for targets named listenerprueba
+
+# Build rule for target.
+listenerprueba: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 listenerprueba
+.PHONY : listenerprueba
+
+# fast build rule for target.
+listenerprueba/fast:
+	$(MAKE) -f CMakeFiles/listenerprueba.dir/build.make CMakeFiles/listenerprueba.dir/build
+.PHONY : listenerprueba/fast
+
 listener.o: listener.cc.o
 
 .PHONY : listener.o
@@ -150,18 +163,49 @@ listener.cc.s:
 	$(MAKE) -f CMakeFiles/listener.dir/build.make CMakeFiles/listener.dir/listener.cc.s
 .PHONY : listener.cc.s
 
+listener_prueba.o: listener_prueba.cc.o
+
+.PHONY : listener_prueba.o
+
+# target to build an object file
+listener_prueba.cc.o:
+	$(MAKE) -f CMakeFiles/listenerprueba.dir/build.make CMakeFiles/listenerprueba.dir/listener_prueba.cc.o
+.PHONY : listener_prueba.cc.o
+
+listener_prueba.i: listener_prueba.cc.i
+
+.PHONY : listener_prueba.i
+
+# target to preprocess a source file
+listener_prueba.cc.i:
+	$(MAKE) -f CMakeFiles/listenerprueba.dir/build.make CMakeFiles/listenerprueba.dir/listener_prueba.cc.i
+.PHONY : listener_prueba.cc.i
+
+listener_prueba.s: listener_prueba.cc.s
+
+.PHONY : listener_prueba.s
+
+# target to generate assembly for a file
+listener_prueba.cc.s:
+	$(MAKE) -f CMakeFiles/listenerprueba.dir/build.make CMakeFiles/listenerprueba.dir/listener_prueba.cc.s
+.PHONY : listener_prueba.cc.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
+	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... listener"
-	@echo "... edit_cache"
+	@echo "... listenerprueba"
 	@echo "... listener.o"
 	@echo "... listener.i"
 	@echo "... listener.s"
+	@echo "... listener_prueba.o"
+	@echo "... listener_prueba.i"
+	@echo "... listener_prueba.s"
 .PHONY : help
 
 

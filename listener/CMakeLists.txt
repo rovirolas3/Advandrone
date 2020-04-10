@@ -9,6 +9,8 @@ list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
 add_executable(listener listener.cc)
 target_link_libraries(listener ${GAZEBO_LIBRARIES} pthread)
 
+add_executable(listenerprueba listener_prueba.cc)
+target_link_libraries(listenerprueba ${GAZEBO_LIBRARIES} pthread)
 
 
 
