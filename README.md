@@ -42,7 +42,7 @@ This directory doesn't need to be downloaded in an exact directory, but there is
 
 * Modify the file **listener.cc** in order to have the correct path in your environment. 
 
-This contains the functions to read the data of each sonar sensor. Depending on the distance 
+This contains the functions to read the data of each sonar sensor. Depending on the distance the drone will evit an obstacle or will return to the position desired. To prove this use in gazebo the existing boxes. 
 
 
 
