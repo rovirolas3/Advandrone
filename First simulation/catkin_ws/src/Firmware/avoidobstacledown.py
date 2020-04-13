@@ -11,13 +11,12 @@ import math
 import yaml
 import sys
 
-
-
-
+global yamlpath
 
 class ObstacleDownAvoider:
     def __init__(self):
-        with open('/home/miguel/catkin_ws/src/Firmware/data.yaml') as f:
+        global yamlpath
+        with open(yamlpath) as f:
     
            data = yaml.load(f, Loader=yaml.FullLoader)
            for key, value in data.items():
@@ -29,38 +28,34 @@ class ObstacleDownAvoider:
 
         self.avoiddownobstacle = rospy.Publisher('gi/avoidobstacle/down', Float32, queue_size=10) # Custom publisher of avoidobstacle
         self.avoiddownobstacle_return = rospy.Publisher('gi/avoidobstacle/down_return', Float32, queue_size=10) # Custom publisher of avoidobstacle
+        self.blockmovementdown = rospy.Publisher('gi/avoidobstacle/down_block', String, queue_size=10) # Custom publisher of avoidobstacle
 
     
     # Moves X meters to the left to evit down obstacle
     def avoid_down_obstacle(self, distance_obst_avoid): # Function called to move the drone X distance to avoid the obstacle
-        with open('/home/miguel/catkin_ws/src/Firmware/data.yaml') as f:
-    
-           data = yaml.load(f, Loader=yaml.FullLoader)
-           for key, value in data.items():
-              if key == "distance_obst_avoid":
-                 distance_obst_avoid = value
-
 
         self.avoiddownobstacle.publish(distance_obst_avoid) # It publishes the float distance to move
 
 
-
     # Moves X meters to the down to remove the distance moved previously
     def avoid_down_obstacle_return(self, distance_obst_avoid): # Function called to move the drone X distance to avoid the obstacle
-        with open('/home/miguel/catkin_ws/src/Firmware/data.yaml') as f:
-    
-           data = yaml.load(f, Loader=yaml.FullLoader)
-           for key, value in data.items():
-              if key == "distance_obst_avoid":
-                 distance_obst_avoid = value
-
 
         self.avoiddownobstacle_return.publish(distance_obst_avoid) # It publishes the float distance to move
 
 
+    # Moves X meters to the back to remove the distance moved previously
+    def block_down_movement(self, message): # Function called to move the drone X distance to avoid the obstacle
+
+        self.blockmovementdown.publish(message) # It publishes the float distance to move
+
+
+
+
 
 if __name__ == "__main__": # From here to the end we call all the functions in our order desired
-    with open('/home/miguel/catkin_ws/src/Firmware/data.yaml') as f:
+    global yamlpath
+    yamlpath = "/home/miguel/catkin_ws/src/Firmware/data.yaml"
+    with open(yamlpath) as f:
    
         data = yaml.load(f, Loader=yaml.FullLoader)
         for key, value in data.items():
@@ -70,14 +65,20 @@ if __name__ == "__main__": # From here to the end we call all the functions in o
 
     avo = ObstacleDownAvoider()
 
+    time.sleep(0.1)
 
     if sys.argv[1] == "BACK":
-        time.sleep(1)
         avo.avoid_down_obstacle_return(distance_obst_avoid)
-        time.sleep(1)
+
+    elif sys.argv[1] == "BLOCK":
+        avo.block_down_movement("True")
+
+    elif sys.argv[1] == "UNBLOCK":
+        avo.block_down_movement("False")
+
     else:
-        time.sleep(1)
         avo.avoid_down_obstacle(distance_obst_avoid)
-        time.sleep(1)
+
+    time.sleep(0.1)
 
 

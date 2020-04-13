@@ -18,6 +18,12 @@ global timesMovedFromPositionDesiredDown
 global timesMovedFromPositionDesiredBack 
 global timesMovedFromPositionDesiredFront 
 
+global blockingMovementRight 
+global blockingMovementLeft  
+global blockingMovementUp 
+global blockingMovementDown
+global blockingMovementBack
+global blockingMovementFront
 
 class Px4Controller:
 
@@ -78,7 +84,20 @@ class Px4Controller:
         global timesMovedFromPositionDesiredBack 
         timesMovedFromPositionDesiredBack = 0 
         global timesMovedFromPositionDesiredFront 
-        timesMovedFromPositionDesiredFront = 0    
+        timesMovedFromPositionDesiredFront = 0
+
+        global blockingMovementRight
+        blockingMovementRight = False  
+        global blockingMovementLeft 
+        blockingMovementLeft = False 
+        global blockingMovementUp
+        blockingMovementUp = False 
+        global blockingMovementDown
+        blockingMovementDown = False
+        global blockingMovementBack
+        blockingMovementBack = False
+        global blockingMovementFront
+        blockingMovementFront = False    
 
         '''
         ros subscribers
@@ -100,21 +119,27 @@ class Px4Controller:
 
         self.avoid_right_obstacle = rospy.Subscriber("gi/avoidobstacle/right", Float32, self.avoid_right_obstacle_callback)
         self.avoid_right_obstacle_return = rospy.Subscriber("gi/avoidobstacle/right_return", Float32, self.avoid_right_obstacle_return_callback)
+        self.blockmovement_right = rospy.Subscriber("gi/avoidobstacle/right_block", String, self.blockmovement_right_callback)
 
         self.avoid_left_obstacle = rospy.Subscriber("gi/avoidobstacle/left", Float32, self.avoid_left_obstacle_callback)
         self.avoid_left_obstacle_return = rospy.Subscriber("gi/avoidobstacle/left_return", Float32, self.avoid_left_obstacle_return_callback)
+        self.blockmovement_left = rospy.Subscriber("gi/avoidobstacle/left_block", String, self.blockmovement_left_callback)
 
         self.avoid_up_obstacle = rospy.Subscriber("gi/avoidobstacle/up", Float32, self.avoid_up_obstacle_callback)
         self.avoid_up_obstacle_return = rospy.Subscriber("gi/avoidobstacle/up_return", Float32, self.avoid_up_obstacle_return_callback)
+        self.blockmovement_up = rospy.Subscriber("gi/avoidobstacle/up_block", String, self.blockmovement_up_callback)
 
         self.avoid_down_obstacle = rospy.Subscriber("gi/avoidobstacle/down", Float32, self.avoid_down_obstacle_callback)
         self.avoid_down_obstacle_return = rospy.Subscriber("gi/avoidobstacle/down_return", Float32, self.avoid_down_obstacle_return_callback)
+        self.blockmovement_down = rospy.Subscriber("gi/avoidobstacle/down_block", String, self.blockmovement_down_callback)
 
         self.avoid_front_obstacle = rospy.Subscriber("gi/avoidobstacle/front", Float32, self.avoid_front_obstacle_callback)
         self.avoid_front_obstacle_return = rospy.Subscriber("gi/avoidobstacle/front_return", Float32, self.avoid_front_obstacle_return_callback)
+        self.blockmovement_front = rospy.Subscriber("gi/avoidobstacle/front_block", String, self.blockmovement_front_callback)
 
         self.avoid_back_obstacle = rospy.Subscriber("gi/avoidobstacle/back", Float32, self.avoid_back_obstacle_callback)
         self.avoid_back_obstacle_return = rospy.Subscriber("gi/avoidobstacle/back_return", Float32, self.avoid_back_obstacle_return_callback)
+        self.blockmovement_back = rospy.Subscriber("gi/avoidobstacle/back_block", String, self.blockmovement_back_callback)
 
         '''
         ros publishers
@@ -257,7 +282,36 @@ class Px4Controller:
 
             print("body FLU frame")
 
+            global blockingMovementRight
+            global blockingMovementLeft 
+            global blockingMovementUp 
+            global blockingMovementDown
+            global blockingMovementBack
+            global blockingMovementFront
+
+            print('Blocking Right: ' + str(blockingMovementRight))
+            print('Blocking Left: ' + str(blockingMovementLeft))
+            print('Blocking Up: ' + str(blockingMovementUp))
+            print('Blocking Down: ' + str(blockingMovementDown))
+            print('Blocking Back: ' + str(blockingMovementBack))
+            print('Blocking Front: ' + str(blockingMovementFront))
+ 
+            if msg.pose.position.x > 0:
+                if blockingMovementFront == True:
+                    msg.pose.position.x = 0
+            elif msg.pose.position.x < 0:
+                if blockingMovementBack == True:
+                    msg.pose.position.x = 0
+
+            if msg.pose.position.y > 0:
+                if blockingMovementLeft == True:
+                    msg.pose.position.y = 0
+            elif msg.pose.position.y < 0:
+                if blockingMovementRight == True:
+                    msg.pose.position.y = 0
+
             ENU_X, ENU_Y, ENU_Z = self.FLU2ENU(msg) # Calls this function to get the ENU values
+
 
             ENU_X = ENU_X + self.local_pose.pose.position.x
             ENU_Y = ENU_Y + self.local_pose.pose.position.y
@@ -296,12 +350,12 @@ class Px4Controller:
 
         print("Received Custom Activity:", msg.data)
 
-        if msg.data == "LAND": # Lands the drone ( z=0.1 so it is minor than the z we introduced 0.15 as minimum to disarm the drone)
+        if msg.data == "LAND": # Lands the drone ( z=0.05 so it is minor than the z we introduced 0.15 as minimum to disarm the drone)
             print("LANDING!")
             self.state = "LAND"
             self.cur_target_pose = self.construct_target(self.local_pose.pose.position.x,
                                                          self.local_pose.pose.position.y,
-                                                         0.1,
+                                                         0.05,
                                                          self.current_heading)
         if msg.data == "TAKEOFF": # takeoff the drone into 0.1 position 
             print("TAKING OFF!")
@@ -331,6 +385,7 @@ class Px4Controller:
     def custom_takeoff_callback(self, msg): # Takes off the drone in the desired height we introduced
         print("Received Custom TakeOff!")
 
+        self.state = "TAKEOFF"
         self.cur_target_pose = self.construct_target(0, 0, msg.data, self.current_heading) # Sets the desired position
         self.arm_state = self.arm() # Arms the drone
 
@@ -343,146 +398,238 @@ class Px4Controller:
 
 
 
-# -------------------------------------------SONAR SENSORS-------------------------------------------------------------------
+# -------------------------------------------SONAR SENSORS-----------------------------------------------------------
 
 
 # -------------------------------------------RIGHT-------------------------------------------------------------------
+
     def avoid_right_obstacle_callback(self, msg): # Makes the drone moves X meters in the left direction to avoid an obstacle
         print("Received Avoiding Right Obstacle!")
-        print(msg.data)
+        #print(msg.data)
 
         if self.state is "HOVER": # If the drone is hovering (not taking off or landing)
             # Sets the desired position
             self.cur_target_pose = self.construct_target(self.local_pose.pose.position.x, self.local_pose.pose.position.y + msg.data, self.local_pose.pose.position.z, self.current_heading)
             global timesMovedFromPositionDesiredRight
-            timesMovedFromPositionDesiredRight = timesMovedFromPositionDesiredRight + 1 
+            timesMovedFromPositionDesiredRight = timesMovedFromPositionDesiredRight + 1
+            global blockingMovementRight
+            blockingMovementRight = True 
 
 
     def avoid_right_obstacle_return_callback(self, msg): # Makes the drone return X meters in the right direction to the desired position
-        print("Received Avoiding Right Obstacle!")
-        print(msg.data)
+        print("Possibility to return Right!")
+        #print(msg.data)
         global timesMovedFromPositionDesiredRight
         if self.state is "HOVER": # If the drone is hovering (not taking off or landing)
+            global blockingMovementRight
+            blockingMovementRight = False
             if timesMovedFromPositionDesiredRight > 0: # If the drone has moved from the desired position previously return X meters to this position
                 # Sets the desired position
                 self.cur_target_pose = self.construct_target(self.local_pose.pose.position.x, self.local_pose.pose.position.y - msg.data, self.local_pose.pose.position.z, self.current_heading)  
                 timesMovedFromPositionDesiredRight = timesMovedFromPositionDesiredRight - 1 
 
+
+    def blockmovement_right_callback(self, msg):
+        global blockingMovementRight
+        if msg.data == "True":
+            blockingMovementRight = True
+            print("Blocking Movement Right!")
+        else: 
+            blockingMovementRight = False
+            print("Unblocking Movement Right!")
+
+             
 # -------------------------------------------LEFT-------------------------------------------------------------------
 
     def avoid_left_obstacle_callback(self, msg): # Makes the drone moves X meters in the left direction to avoid an obstacle
         print("Received Avoiding Left Obstacle!")
-        print(msg.data)
+        #print(msg.data)
 
         if self.state is "HOVER": # If the drone is hovering (not taking off or landing)
             # Sets the desired position
             self.cur_target_pose = self.construct_target(self.local_pose.pose.position.x, self.local_pose.pose.position.y - msg.data, self.local_pose.pose.position.z, self.current_heading)
             global timesMovedFromPositionDesiredLeft
-            timesMovedFromPositionDesiredLeft = timesMovedFromPositionDesiredLeft + 1 
+            timesMovedFromPositionDesiredLeft = timesMovedFromPositionDesiredLeft + 1
+            global blockingMovementLeft
+            blockingMovementLeft = True  
 
 
     def avoid_left_obstacle_return_callback(self, msg): # Makes the drone return X meters in the left direction to the desired position
-        print("Received Avoiding Left Obstacle!")
-        print(msg.data)
+        print("Possibility to return Left!")
+        #print(msg.data)
         global timesMovedFromPositionDesiredLeft
         if self.state is "HOVER": # If the drone is hovering (not taking off or landing)
+            global blockingMovementLeft
+            blockingMovementLeft = False
             if timesMovedFromPositionDesiredLeft > 0: # If the drone has moved from the desired position previously return X meters to this position
                 # Sets the desired position
                 self.cur_target_pose = self.construct_target(self.local_pose.pose.position.x, self.local_pose.pose.position.y + msg.data, self.local_pose.pose.position.z, self.current_heading)  
                 timesMovedFromPositionDesiredLeft = timesMovedFromPositionDesiredLeft - 1 
 
+
+    def blockmovement_left_callback(self, msg):
+        global blockingMovementLeft
+        if msg.data == "True":
+            blockingMovementLeft = True
+            print("Blocking Movement Left!")
+        else: 
+            blockingMovementLeft = False
+            print("Unblocking Movement Left!")
+
 # -------------------------------------------UP-------------------------------------------------------------------
 
     def avoid_up_obstacle_callback(self, msg): # Makes the drone moves X meters in the down direction to avoid an obstacle
         print("Received Avoiding Up Obstacle!")
-        print(msg.data)
+        #print(msg.data)
 
-        if self.state is "HOVER": # If the drone is hovering (not taking off or landing)
+        #if self.state is "HOVER": # If the drone is hovering (not taking off or landing)
             # Sets the desired position
-            self.cur_target_pose = self.construct_target(self.local_pose.pose.position.x, self.local_pose.pose.position.y, self.local_pose.pose.position.z - msg.data, self.current_heading)
-            global timesMovedFromPositionDesiredUp
-            timesMovedFromPositionDesiredUp = timesMovedFromPositionDesiredUp + 1 
+        self.cur_target_pose = self.construct_target(self.local_pose.pose.position.x, self.local_pose.pose.position.y, self.local_pose.pose.position.z - msg.data, self.current_heading)
+        global timesMovedFromPositionDesiredUp
+        timesMovedFromPositionDesiredUp = timesMovedFromPositionDesiredUp + 1 
+        global blockingMovementUp
+        blockingMovementUp = True
 
 
     def avoid_up_obstacle_return_callback(self, msg): # Makes the drone return X meters in the up direction to the desired position
-        print("Received Avoiding Up Obstacle!")
-        print(msg.data)
+        print("Possibility to return Up!")
+        #print(msg.data)
         global timesMovedFromPositionDesiredUp
-        if self.state is "HOVER": # If the drone is hovering (not taking off or landing)
-            if timesMovedFromPositionDesiredUp > 0: # If the drone has moved from the desired position previously return X meters to this position
-                # Sets the desired position
-                self.cur_target_pose = self.construct_target(self.local_pose.pose.position.x, self.local_pose.pose.position.y, self.local_pose.pose.position.z + msg.data, self.current_heading)  
-                timesMovedFromPositionDesiredUp = timesMovedFromPositionDesiredUp - 1 
+        #if self.state is "HOVER": # If the drone is hovering (not taking off or landing)
+        global blockingMovementUp
+        blockingMovementUp = False
+        if timesMovedFromPositionDesiredUp > 0: # If the drone has moved from the desired position previously return X meters to this position
+            # Sets the desired position
+            self.cur_target_pose = self.construct_target(self.local_pose.pose.position.x, self.local_pose.pose.position.y, self.local_pose.pose.position.z + msg.data, self.current_heading)  
+            timesMovedFromPositionDesiredUp = timesMovedFromPositionDesiredUp - 1 
+
+
+    def blockmovement_up_callback(self, msg):
+        global blockingMovementUp
+        if msg.data == "True":
+            blockingMovementUp = True
+            print("Blocking Movement Up!")
+        else: 
+            blockingMovementUp = False
+            print("Unblocking Movement Up!")
 
 # -------------------------------------------DOWN-------------------------------------------------------------------
 
     def avoid_down_obstacle_callback(self, msg): # Makes the drone moves X meters in the left direction to avoid an obstacle
         print("Received Avoiding Down Obstacle!")
-        print(msg.data)
+        #print(msg.data)
 
         if self.state is "HOVER": # If the drone is hovering (not taking off or landing)
             # Sets the desired position
             self.cur_target_pose = self.construct_target(self.local_pose.pose.position.x, self.local_pose.pose.position.y, self.local_pose.pose.position.z + msg.data, self.current_heading)
             global timesMovedFromPositionDesiredDown
             timesMovedFromPositionDesiredDown = timesMovedFromPositionDesiredDown + 1 
+            global blockingMovementDown
+            blockingMovementDown = True
 
 
     def avoid_down_obstacle_return_callback(self, msg): # Makes the drone return X meters in the down direction to the desired position
-        print("Received Avoiding Down Obstacle!")
-        print(msg.data)
+        print("Possibility to return Down!")
+        #print(msg.data)
         global timesMovedFromPositionDesiredDown
         if self.state is "HOVER": # If the drone is hovering (not taking off or landing)
+            global blockingMovementDown
+            blockingMovementDown = False
             if timesMovedFromPositionDesiredDown > 0: # If the drone has moved from the desired position previously return X meters to this position
                 # Sets the desired position
                 self.cur_target_pose = self.construct_target(self.local_pose.pose.position.x, self.local_pose.pose.position.y, self.local_pose.pose.position.z - msg.data, self.current_heading)  
                 timesMovedFromPositionDesiredDown = timesMovedFromPositionDesiredDown - 1 
 
+
+    def blockmovement_down_callback(self, msg):
+        global blockingMovementDown
+        if msg.data  == "True":
+            blockingMovementDown = True
+            print("Blocking Movement Down!")
+        else: 
+            blockingMovementDown = False
+            print("Unblocking Movement Down!")
+
 # -------------------------------------------FRONT-------------------------------------------------------------------
 
     def avoid_front_obstacle_callback(self, msg): # Makes the drone moves X meters in the left direction to avoid an obstacle
         print("Received Avoiding Front Obstacle!")
-        print(msg.data)
+        #print(msg.data)
 
         if self.state is "HOVER": # If the drone is hovering (not taking off or landing)
             # Sets the desired position
             self.cur_target_pose = self.construct_target(self.local_pose.pose.position.x - msg.data, self.local_pose.pose.position.y , self.local_pose.pose.position.z, self.current_heading)
             global timesMovedFromPositionDesiredFront
-            timesMovedFromPositionDesiredFront = timesMovedFromPositionDesiredFront + 1 
+            timesMovedFromPositionDesiredFront = timesMovedFromPositionDesiredFront + 1
+            global blockingMovementFront
+            blockingMovementFront = True 
 
 
     def avoid_front_obstacle_return_callback(self, msg): # Makes the drone return X meters in the front direction to the desired position
-        print("Received Avoiding Front Obstacle!")
-        print(msg.data)
+        print("Possibility to return Front!")
+        #print(msg.data)
         global timesMovedFromPositionDesiredFront
         if self.state is "HOVER": # If the drone is hovering (not taking off or landing)
+            global blockingMovementFront
+            blockingMovementFront = False
             if timesMovedFromPositionDesiredFront > 0: # If the drone has moved from the desired position previously return X meters to this position
                 # Sets the desired position
                 self.cur_target_pose = self.construct_target(self.local_pose.pose.position.x + msg.data, self.local_pose.pose.position.y, self.local_pose.pose.position.z, self.current_heading)  
                 timesMovedFromPositionDesiredFront = timesMovedFromPositionDesiredFront - 1 
+
+
+    def blockmovement_front_callback(self, msg):
+        global blockingMovementFront
+        if msg.data  == "True":
+            blockingMovementFront = True
+            print("Blocking Movement Front!")
+        else: 
+            blockingMovementFront = False
+            print("Unblocking Movement Front!")
 
  
 # -------------------------------------------BACK-------------------------------------------------------------------
 
     def avoid_back_obstacle_callback(self, msg): # Makes the drone moves X meters in the left direction to avoid an obstacle
         print("Received Avoiding Back Obstacle!")
-        print(msg.data)
+        #print(msg.data)
 
         if self.state is "HOVER": # If the drone is hovering (not taking off or landing)
             # Sets the desired position
             self.cur_target_pose = self.construct_target(self.local_pose.pose.position.x + msg.data, self.local_pose.pose.position.y, self.local_pose.pose.position.z, self.current_heading)
             global timesMovedFromPositionDesiredBack
-            timesMovedFromPositionDesiredBack = timesMovedFromPositionDesiredBack + 1 
+            timesMovedFromPositionDesiredBack = timesMovedFromPositionDesiredBack + 1
+            global blockingMovementBack
+            blockingMovementBack = True 
 
 
     def avoid_back_obstacle_return_callback(self, msg): # Makes the drone return X meters in the back direction to the desired position
-        print("Received Avoiding Back Obstacle!")
-        print(msg.data)
+        print("Possibility to return Back!")
+        #print(msg.data)
         global timesMovedFromPositionDesiredBack
         if self.state is "HOVER": # If the drone is hovering (not taking off or landing)
+            global blockingMovementBack
+            blockingMovementBack = False
             if timesMovedFromPositionDesiredBack > 0: # If the drone has moved from the desired position previously return X meters to this position
                 # Sets the desired position
                 self.cur_target_pose = self.construct_target(self.local_pose.pose.position.x - msg.data, self.local_pose.pose.position.y, self.local_pose.pose.position.z, self.current_heading)  
-                timesMovedFromPositionDesiredBack = timesMovedFromPositionDesiredBack - 1 
+                timesMovedFromPositionDesiredBack = timesMovedFromPositionDesiredBack - 1
+                 
+
+    def blockmovement_back_callback(self, msg):
+        global blockingMovementBack
+        if msg.data == "True":
+            blockingMovementBack = True
+            print("Blocking Movement Back!")
+        else: 
+            blockingMovementBack = False
+            print("Unblocking Movement Back!")
+
+
+
+
+
+
 
 
 
@@ -517,6 +664,20 @@ class Px4Controller:
             return False
 
     def disarm(self): #Disarms the drone
+
+        global timesMovedFromPositionDesiredRight
+        timesMovedFromPositionDesiredRight = 0  
+        global timesMovedFromPositionDesiredLeft
+        timesMovedFromPositionDesiredLeft = 0  
+        global timesMovedFromPositionDesiredUp 
+        timesMovedFromPositionDesiredUp = 0 
+        global timesMovedFromPositionDesiredDown 
+        timesMovedFromPositionDesiredDown = 0 
+        global timesMovedFromPositionDesiredBack 
+        timesMovedFromPositionDesiredBack = 0 
+        global timesMovedFromPositionDesiredFront 
+        timesMovedFromPositionDesiredFront = 0
+
         if self.armService(False):
             return True
         else:

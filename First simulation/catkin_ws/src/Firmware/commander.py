@@ -11,13 +11,14 @@ import math
 import yaml
 
 
-
+global yamlpath
 
 
 
 class Commander:
     def __init__(self):
-        with open('/home/miguel/catkin_ws/src/Firmware/data.yaml') as f:
+        global yamlpath
+        with open(yamlpath) as f:
     
            data = yaml.load(f, Loader=yaml.FullLoader)
            for key, value in data.items():
@@ -82,9 +83,11 @@ class Commander:
 
 
 if __name__ == "__main__": # From here to the end we call all the functions in our order desired
-    
 
-    with open('/home/miguel/catkin_ws/src/Firmware/data.yaml') as f:
+    global yamlpath
+    yamlpath = "/home/miguel/catkin_ws/src/Firmware/data.yaml"
+
+    with open(yamlpath) as f:
     
         data = yaml.load(f, Loader=yaml.FullLoader)
         for key, value in data.items():
@@ -102,37 +105,141 @@ if __name__ == "__main__": # From here to the end we call all the functions in o
     time.sleep(2)
     print("Take off in progress...")
     con.takeoff_custom(takeoff_height_value)
-    time.sleep(2)
+    time.sleep(5)
 
 
     print("Moving one meter in X direction in 5 seconds")
     con.hover()
-    time.sleep(60)
+    time.sleep(5)
     for x in range(5,0,-1):
         print("Moving in... " + str(x))
         time.sleep(1)
     
     print("Moving in progress...")
     con.move(moving_x,moving_y,moving_z)
-    time.sleep(2)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
+    print("Moving in progress...")
+    con.move(moving_x,moving_y,moving_z)
+    time.sleep(4)
 
-    print("Landing in 1 minute")
-    time.sleep(5)
 
-    for x in range(10,0,-1):
+
+    print("Landing in 5 seconds")
+    time.sleep(1)
+
+    for x in range(5,0,-1):
         print("Landing in... " + str(x))
         time.sleep(1)
     
     print("Landing in progress...") 
     con.land()
-    time.sleep(10)
+    time.sleep(8)
+
+    con.land()
+    time.sleep(8)
 
 
 
     print("Going home")
     con.takeoff()
     time.sleep(4)
-    con.move(- moving_x,- moving_y,- moving_z)
+    con.move(0,0,1, False)
     time.sleep(4)
     con.land()
 

@@ -11,13 +11,14 @@ import math
 import yaml
 import sys
 
-
+global yamlpath
 
 
 
 class ObstacleFrontAvoider:
     def __init__(self):
-        with open('/home/miguel/catkin_ws/src/Firmware/data.yaml') as f:
+        global yamlpath
+        with open(yamlpath) as f:
     
            data = yaml.load(f, Loader=yaml.FullLoader)
            for key, value in data.items():
@@ -29,38 +30,33 @@ class ObstacleFrontAvoider:
 
         self.avoidfrontobstacle = rospy.Publisher('gi/avoidobstacle/front', Float32, queue_size=10) # Custom publisher of avoidobstacle
         self.avoidfrontobstacle_return = rospy.Publisher('gi/avoidobstacle/front_return', Float32, queue_size=10) # Custom publisher of avoidobstacle
-
+        self.blockmovementfront = rospy.Publisher('gi/avoidobstacle/front_block', String, queue_size=10) # Custom publisher of avoidobstacle
     
+
     # Moves X meters to the left to evit front obstacle
     def avoid_front_obstacle(self, distance_obst_avoid): # Function called to move the drone X distance to avoid the obstacle
-        with open('/home/miguel/catkin_ws/src/Firmware/data.yaml') as f:
-    
-           data = yaml.load(f, Loader=yaml.FullLoader)
-           for key, value in data.items():
-              if key == "distance_obst_avoid":
-                 distance_obst_avoid = value
-
 
         self.avoidfrontobstacle.publish(distance_obst_avoid) # It publishes the float distance to move
 
 
-
     # Moves X meters to the front to remove the distance moved previously
     def avoid_front_obstacle_return(self, distance_obst_avoid): # Function called to move the drone X distance to avoid the obstacle
-        with open('/home/miguel/catkin_ws/src/Firmware/data.yaml') as f:
-    
-           data = yaml.load(f, Loader=yaml.FullLoader)
-           for key, value in data.items():
-              if key == "distance_obst_avoid":
-                 distance_obst_avoid = value
-
 
         self.avoidfrontobstacle_return.publish(distance_obst_avoid) # It publishes the float distance to move
 
 
+    # Moves X meters to the back to remove the distance moved previously
+    def block_front_movement(self, message): # Function called to move the drone X distance to avoid the obstacle
+
+        self.blockmovementfront.publish(message) # It publishes the float distance to move
+
+
+
 
 if __name__ == "__main__": # From here to the end we call all the functions in our order desired
-    with open('/home/miguel/catkin_ws/src/Firmware/data.yaml') as f:
+    global yamlpath
+    yamlpath = "/home/miguel/catkin_ws/src/Firmware/data.yaml"
+    with open(yamlpath) as f:
    
         data = yaml.load(f, Loader=yaml.FullLoader)
         for key, value in data.items():
@@ -70,14 +66,20 @@ if __name__ == "__main__": # From here to the end we call all the functions in o
 
     avo = ObstacleFrontAvoider()
 
+    time.sleep(0.1)
 
     if sys.argv[1] == "BACK":
-        time.sleep(1)
         avo.avoid_front_obstacle_return(distance_obst_avoid)
-        time.sleep(1)
+
+    elif sys.argv[1] == "BLOCK":
+        avo.block_front_movement("True")
+
+    elif sys.argv[1] == "UNBLOCK":
+        avo.block_front_movement("False")
+
     else:
-        time.sleep(1)
         avo.avoid_front_obstacle(distance_obst_avoid)
-        time.sleep(1)
+
+    time.sleep(0.1)
 
 
