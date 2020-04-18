@@ -53,14 +53,14 @@ make
 In terminal 4:
 
 ```
-cd 'your\_path'/catkin_ws/src/Firmware
+cd 'your_path'/catkin_ws/src/Firmware
 python px4_mavros_run.py
 ```
 
 In terminal 5:
 
 ```
-cd 'your\_path'/catkin_ws/src/Firmware
+cd 'your_path'/catkin_ws/src/Firmware
 python commander.py
 ```
 
