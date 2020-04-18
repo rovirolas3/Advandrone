@@ -14,7 +14,9 @@ In a terminal:
 In a second terminal:
 
 > cd 'your_path'/listener/build
+
 > make 
+
 > ./listener
 
 In a third terminal:
