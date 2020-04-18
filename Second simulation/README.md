@@ -5,7 +5,7 @@ In this simulation we will make the drone to go to a random position where there
 
 The code is very similar to the first simulation. You can see the changes in the **commander.py** and in the **px4_mavros_run.py** files.
 
-To prove the simulation use the building provided in the directory building\_editor_models.
+To prove the simulation use the buildings provided in the directory building\_editor_models.
 
 ## Paths that are mandatory to be changed
 
