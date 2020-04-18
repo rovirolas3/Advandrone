@@ -1,7 +1,7 @@
 # First simulation
 ## First movements and avoiding obstacles 
 
-In this simulation we will make the drone to go to a desired position. The drone will detects obstacles and depending on the distance it will block the movement, it will unblock the movement or it will go to the opposite direction to evit an obstacle. 
+In this simulation we will make the drone go to a desired position. The drone will detect obstacles and depending on the distance it will block the movement, it will unblock the movement or it will go to the opposite direction to evit an obstacle. 
 
 
 ## Commands
