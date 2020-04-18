@@ -3,6 +3,8 @@
 
 In this simulation we will make the drone go to a desired position. The drone will detect obstacles and depending on the distance it will block the movement, it will unblock the movement or it will go to the opposite direction to evit an obstacle. 
 
+To prove the simulation use the building provided in the directory building\_editor_models.
+
 ## Paths that are mandatory to be changed
 
 In the file listener/listener.cc:
