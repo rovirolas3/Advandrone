@@ -26,11 +26,6 @@ In a third terminal:
 
 
 
-Testing
-
-<asdasz> ajdlakjda
-
-
 
 
 
