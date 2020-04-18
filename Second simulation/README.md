@@ -3,7 +3,7 @@
 
 In this simulation we will make the drone to go to a random position where there is no obstacle detected. So the drone will choose one of the four directions that the movement it is not blocked.
 
-The code it is very similar to the first simulation. You can see the changes in the **commander.py** and in the **px4_mavros_run.py** files.
+The code is very similar to the first simulation. You can see the changes in the **commander.py** and in the **px4_mavros_run.py** files.
 
 ## Commands
 
@@ -23,6 +23,12 @@ In a third terminal:
 
 > roslaunch px4 final_pythonscripts.launch
 
+
+
+
+Testing
+
+<asdasz> ajdlakjda
 
 
 
