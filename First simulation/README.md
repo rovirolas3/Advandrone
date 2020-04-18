@@ -7,7 +7,7 @@ To prove the simulation use the buildings provided in the directory building\_ed
 
 ## Paths that are mandatory to be changed
 
-In the following files change the part 'your_path' with the path in your environment. 
+In the following files change the part **'your_path'** with the path in your environment. 
 
 In the file **listener/listener.cc**:
 
