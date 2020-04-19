@@ -355,6 +355,7 @@ class Px4Controller:
 
         if msg.data == "LAND": # Lands the drone ( z=0.05 so it is minor than the z we introduced 0.15 as minimum to disarm the drone)
             print("LANDING!")
+            rospy.loginfo("Landing!")
             self.state = "LAND"
             self.cur_target_pose = self.construct_target(self.local_pose.pose.position.x,
                                                          self.local_pose.pose.position.y,
@@ -362,6 +363,7 @@ class Px4Controller:
                                                          self.current_heading)
         elif msg.data == "TAKEOFF": # takeoff the drone into 0.1 position 
             print("TAKING OFF!")
+            rospy.loginfo("Taking Off!")
             self.state = "TAKEOFF"
             print("Taking of X:")
             print(self.local_pose.pose.position.x)
@@ -371,17 +373,20 @@ class Px4Controller:
                                                          self.local_pose.pose.position.y,
                                                          self.takeoff_height,
                                                          self.current_heading)
-            self.arm_state = self.arm() # Arms the drone 
+            self.arm_state = self.arm() # Arms the drone
+ 
 
-            if self.takeoff_detection(): # If it has been initialized correctly it will print one thing or the other
-                print("Vehicle Took Off!")
+            #if self.takeoff_detection(): # If it has been initialized correctly it will print one thing or the other
+            #    print("Vehicle Took Off!")
 
-            else:
-                print("Vehicle Took Off Failed!")
-                return
+            #else:
+            #    print("Vehicle Took Off Failed!")
+            #    return
+ 
 
         elif msg.data == "HOVER": # Hover the drone
             print("HOVERING!")
+            rospy.loginfo("Hovering!")
             self.state = "HOVER"
             self.hover()
 
@@ -389,6 +394,7 @@ class Px4Controller:
         elif msg.data == "RANDOMMOVE": # Creates a random movement to a location with no obstacles
 
             print("RANDOM MOVE!")
+            
 
             global blockingMovementRight
             global blockingMovementLeft 
@@ -422,6 +428,7 @@ class Px4Controller:
                                                                        self.local_pose.pose.position.z,
                                                                        self.current_heading)
                           print("Random Movement ---> Right")
+                          rospy.loginfo("Random Movement: Right!")
 
                   elif value == 1:
                       if blockingMovementLeft == False:
@@ -431,6 +438,7 @@ class Px4Controller:
                                                                        self.local_pose.pose.position.z,
                                                                        self.current_heading)
                           print("Random Movement ---> Left")
+                          rospy.loginfo("Random Movement: Left!")
 
                   elif value == 2:
                       if blockingMovementBack == False:
@@ -440,6 +448,7 @@ class Px4Controller:
                                                                        self.local_pose.pose.position.z,
                                                                        self.current_heading)
                           print("Random Movement ---> Back")
+                          rospy.loginfo("Random Movement: Back!")
 
                   elif value == 3:
                       if blockingMovementFront == False:
@@ -449,6 +458,7 @@ class Px4Controller:
                                                                        self.local_pose.pose.position.z,
                                                                        self.current_heading)
                           print("Random Movement ---> Front")
+                          rospy.loginfo("Random Movement: Front!")
             print ("--------------------------------")
   
 
@@ -458,19 +468,20 @@ class Px4Controller:
 
     # Takes off the drone in the desired height we have introduced
     def custom_takeoff_callback(self, msg): 
-        print("Received Custom TakeOff!")
+        print("Received Custom Take Off!")
+        rospy.loginfo("Custom Take Off!")
 
         self.state = "TAKEOFF"
         self.cur_target_pose = self.construct_target(0, 0, msg.data, self.current_heading) # Sets the desired position
         self.arm_state = self.arm() # Arms the drone
+        
+        #if self.takeoff_detection(): # Detect if the drone has takeoff correctly or not
+        #    print("Vehicle Took Off!")
 
-        if self.takeoff_detection(): # Detect if the drone has takeoff correctly or not
-            print("Vehicle Took Off!")
-
-        else:
-            print("Vehicle Took Off Failed!")
-            return
-
+        #else:
+        #    print("Vehicle Took Off Failed!")
+        #    return
+        
 
 
 # -------------------------------------------SONAR SENSORS-----------------------------------------------------------
@@ -489,7 +500,8 @@ class Px4Controller:
             global timesMovedFromPositionDesiredRight
             timesMovedFromPositionDesiredRight = timesMovedFromPositionDesiredRight + 1
             global blockingMovementRight
-            blockingMovementRight = True 
+            blockingMovementRight = True
+            rospy.logwarn("Avoiding Right Obstacle") 
 
 
     def avoid_right_obstacle_return_callback(self, msg): # Makes the drone return X meters in the right direction to the desired position
@@ -533,7 +545,8 @@ class Px4Controller:
             global timesMovedFromPositionDesiredLeft
             timesMovedFromPositionDesiredLeft = timesMovedFromPositionDesiredLeft + 1
             global blockingMovementLeft
-            blockingMovementLeft = True  
+            blockingMovementLeft = True
+            rospy.logwarn("Avoiding Left Obstacle")  
 
 
     def avoid_left_obstacle_return_callback(self, msg): # Makes the drone return X meters in the left direction to the desired position
@@ -575,6 +588,7 @@ class Px4Controller:
         timesMovedFromPositionDesiredUp = timesMovedFromPositionDesiredUp + 1 
         global blockingMovementUp
         blockingMovementUp = True
+        rospy.logwarn("Avoiding Up Obstacle")
 
 
     def avoid_up_obstacle_return_callback(self, msg): # Makes the drone return X meters in the up direction to the desired position
@@ -618,6 +632,7 @@ class Px4Controller:
             timesMovedFromPositionDesiredDown = timesMovedFromPositionDesiredDown + 1 
             global blockingMovementDown
             blockingMovementDown = True
+            rospy.logwarn("Avoiding Down Obstacle")
 
 
     def avoid_down_obstacle_return_callback(self, msg): # Makes the drone return X meters in the down direction to the desired position
@@ -659,7 +674,8 @@ class Px4Controller:
             global timesMovedFromPositionDesiredFront
             timesMovedFromPositionDesiredFront = timesMovedFromPositionDesiredFront + 1
             global blockingMovementFront
-            blockingMovementFront = True 
+            blockingMovementFront = True
+            rospy.logwarn("Avoiding Front Obstacle") 
 
 
     def avoid_front_obstacle_return_callback(self, msg): # Makes the drone return X meters in the front direction to the desired position
@@ -703,7 +719,8 @@ class Px4Controller:
             global timesMovedFromPositionDesiredBack
             timesMovedFromPositionDesiredBack = timesMovedFromPositionDesiredBack + 1
             global blockingMovementBack
-            blockingMovementBack = True 
+            blockingMovementBack = True
+            rospy.logwarn("Avoiding Back Obstacle") 
 
 
     def avoid_back_obstacle_return_callback(self, msg): # Makes the drone return X meters in the back direction to the desired position
@@ -763,9 +780,11 @@ class Px4Controller:
     #Arms the drone
     def arm(self): 
         if self.armService(True):
+            rospy.loginfo("Drone armed!")
             return True
         else:
             print("Vehicle arming failed!")
+            rospy.logerr("Drone arming failed!")
             return False
 
     #Disarms the drone
@@ -785,9 +804,11 @@ class Px4Controller:
         timesMovedFromPositionDesiredFront = 0
 
         if self.armService(False):
+            rospy.loginfo("Drone disarmed!")
             return True
         else:
             print("Vehicle disarming failed!")
+            rospy.logerr("Drone disarming failed!")
             return False
 
     # Initialize the drone into offboard service
@@ -795,7 +816,8 @@ class Px4Controller:
         if self.flightModeService(custom_mode='OFFBOARD'):
             return True
         else:
-            print("Vechile Offboard failed")
+            print("Vehicle Offboard failed")
+            rospy.loginfo("Vehicle Offboard failed!")
             return False
 
     # Hover the drone in the actual position
