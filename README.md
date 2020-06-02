@@ -13,7 +13,7 @@ The aim of this project is to finally run a real drone who will travel a little 
 ## Environment installation
 
 This repository contains code supported on the following installation:
-
+* Install Linux 18.04 in your computer. You can use [rufus](https://rufus.ie/es_ES.html) to install your image in an USB and making it more easy to install Linux in your computer. 
 * Install ROS Melodic following the steps included in this [webpage](http://wiki.ros.org/melodic)
 * Follow the steps of [GAAS](https://gaas.gitbook.io/guide/software-realization-build-your-own-autonomous-drone/build-your-own-autonomous-drone-e01-offboard-control-and-gazebo-simulation) (we will change files of this environment in order to make our properly simulations. 
   * Skip the installation of ROS Melodic 
