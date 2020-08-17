@@ -5,6 +5,8 @@ This repository holds the first steps to control a drone using ROS and specially
 
 The aim of this project is to finally run a real drone who will travel a little distance in an autonomous form. The real drone will be an hexacopter but the simulation will work in a quadcopter. 
 
+In the fifht simulation you will find the final code and cleaned for a better understanding.
+
 ## Advandrone Team
 
 * Miguel López Delgado: miguel.lopez04@estudiant.upf.edu 
