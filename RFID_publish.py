@@ -397,4 +397,3 @@ if __name__ == '__main__': # From here to the end calls the functions desired
     con = RFIDpublisher()
     con.start()
 
-
