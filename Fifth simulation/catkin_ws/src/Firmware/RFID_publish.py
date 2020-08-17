@@ -191,13 +191,11 @@ class RFIDpublisher:
                     value = angle_respect_yaw + 180
                     angle_respect_yaw = 180+value
 
-                # Calculates the angle of the RFID antenna and the front perspective of the drone - It takes in account orientation!         - pitch
-                angle = self.calculate_pitch_degree_RFID(angle_respect_yaw, distance_x_y,RFID_antenna.z)
-                angle_respect_pitch = angle - (self.drone_pitch * 180 / math.pi) # We substract the value of the orientation
+                # Calculates the angle of the RFID antenna and the front perspective of the drone        - pitch
+                angle_respect_pitch = self.calculate_pitch_degree_RFID(angle_respect_yaw, distance_x_y,RFID_antenna.z)
 
-                # Calculates the angle of the RFID antenna and the front perspective of the drone - It takes in account orientation!         - roll
-                angle = self.calculate_roll_degree_RFID(angle_respect_yaw, distance_x_y,RFID_antenna.z)
-                angle_respect_roll = angle - (self.drone_roll * 180 / math.pi) # We substract the value of the orientation
+                # Calculates the angle of the RFID antenna and the front perspective of the drone        - roll
+                angle_respect_roll = self.calculate_roll_degree_RFID(angle_respect_yaw, distance_x_y,RFID_antenna.z)
      
                 # Depending on the angle it represents one antenna or another or no-one
                 detection = self.print_detected_antenna(angle_respect_yaw, angle_respect_pitch, angle_respect_roll)
