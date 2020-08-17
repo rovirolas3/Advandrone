@@ -9,16 +9,13 @@ from pyquaternion import Quaternion
 import time
 import math
 import yaml
-
-
-global yamlpath
-
+import threading
 
 
 class Commander:
     def __init__(self):
-        global yamlpath
-        with open(yamlpath) as f:
+
+        with open(self.yamlpath) as f:
     
            data = yaml.load(f, Loader=yaml.FullLoader)
            for key, value in data.items():
@@ -32,39 +29,40 @@ class Commander:
         self.custom_activity_pub = rospy.Publisher('gi/set_activity/type', String, queue_size=10) # Custom publisher of some Strings which will evolve in an specific function
         self.custom_takeoff = rospy.Publisher('gi/set_activity/takeoff', Float32, queue_size=10) # Custom publisher of a takeoff + hight
 
-    def move(self, x, y, z, BODY_OFFSET_ENU=True):  # Function called to publish the new position 
+    # Function called to publish the new position 
+    def move(self, x, y, z, BODY_OFFSET_ENU=True):  
         self.position_target_pub.publish(self.set_pose(x, y, z, BODY_OFFSET_ENU)) # It also calls the set_pose function
 
-
-    def turn(self, yaw_degree): # Function called to publish the degrees what we have to yaw
+    # Function called to publish the degrees what we have to yaw
+    def turn(self, yaw_degree): 
         self.yaw_target_pub.publish(yaw_degree) # It publishes it 
 
-    
     # land at current position
-    def land(self): # Function called to land the drone
+    def land(self): 
         self.custom_activity_pub.publish(String("LAND")) # It publishes the string LAND
 
-
     # hover at current position
-    def hover(self): # Function called to hover the drone
+    def hover(self): 
         self.custom_activity_pub.publish(String("HOVER")) # It publishes the string HOVER
 
-
     # takeoff
-    def takeoff(self): # Function called to takeoff the drone but still in the height position desired in the other python script
+    def takeoff(self): 
         self.custom_activity_pub.publish(String("TAKEOFF")) # It publishes the string TAKEOFF
 
-
     # takeoff custom
-    def takeoff_custom(self, height): # Function called to take off the drone to an specific Z 
+    def takeoff_custom(self, height): 
         self.custom_takeoff.publish(height)  # It publishes the height
 
     # return to home position with defined height
     def return_home(self, height): 
         self.position_target_pub.publish(self.set_pose(0, 0, height, False)) # It also calls the set_pose function
 
+    # Does a rondom movement where it is allowed
+    def move_randomly(self): 
+        self.custom_activity_pub.publish(String("RANDOMMOVE")) # It publishes the string RANDOMMOVE
 
-    def set_pose(self, x=0, y=0, z=2, BODY_FLU = True): # Function to set the new position
+    # Function to set the new position
+    def set_pose(self, x=0, y=0, z=2, BODY_FLU = True): 
         pose = PoseStamped() # Creates the message PoseStamped which has header + pose
         pose.header.stamp = rospy.Time.now() # Introduce to the stamp parameter of the header the time 
 
@@ -82,10 +80,15 @@ class Commander:
         return pose # Return the variable pose
 
 
+
+
+
+#########################################################################################################################
+
+
 if __name__ == "__main__": # From here to the end we call all the functions in our order desired
 
-    global yamlpath
-    yamlpath = "/home/miguel/catkin_ws/src/Firmware/data.yaml"
+    self.yamlpath = "/home/miguel/catkin_ws/src/Firmware/data.yaml"
 
     with open(yamlpath) as f:
     
@@ -107,33 +110,17 @@ if __name__ == "__main__": # From here to the end we call all the functions in o
     con.takeoff_custom(takeoff_height_value)
     time.sleep(5)
 
-
-    print("Moving one meter in X direction in 5 seconds")
+    print("Moving half meter in a random direction each 6 seconds")
     con.hover()
-    time.sleep(5)
-    for x in range(5,0,-1):
+    time.sleep(1)
+    for x in range(4,0,-1):
         print("Moving in... " + str(x))
         time.sleep(1)
-    
-    print("Moving in progress...")
-    con.move(moving_x,moving_y,moving_z)
-    time.sleep(4)
-    print("Moving in progress...")
-    con.move(moving_x,moving_y,moving_z)
-    time.sleep(4)
-    print("Moving in progress...")
-    con.move(moving_x,moving_y,moving_z)
-    time.sleep(4)
-    print("Moving in progress...")
-    con.move(moving_x,moving_y,moving_z)
-    time.sleep(4)
-    print("Moving in progress...")
-    con.move(moving_x,moving_y,moving_z)
-    time.sleep(4)
-    print("Moving in progress...")
-    con.move(moving_x,moving_y,moving_z)
-    time.sleep(4)
-
+    print("Total movements: 30")
+    for x in range (30):
+        print("Movement number " +str(x))
+        con.move_randomly()
+        time.sleep(6)
 
 
     print("Landing in 5 seconds")
@@ -147,15 +134,10 @@ if __name__ == "__main__": # From here to the end we call all the functions in o
     con.land()
     time.sleep(8)
 
-    con.land()
-    time.sleep(8)
-
-
-
     print("Going home")
     con.takeoff()
-    time.sleep(4)
-    con.move(0,0,1, False)
-    time.sleep(4)
+    time.sleep(6)
+    con.move(0,0,4, False)
+    time.sleep(10)
     con.land()
 

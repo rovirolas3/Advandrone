@@ -8,7 +8,7 @@ The aim of this project is to finally run a real drone who will travel a little 
 ## Advandrone Team
 
 * Miguel López Delgado: miguel.lopez04@estudiant.upf.edu 
-* Teacher - ask if it is possible to write the name
+* Abdussalam Alajami: Abdussalam.alajami@upf.edu
 
 ## Environment installation
 
@@ -18,18 +18,6 @@ This repository contains code supported on the following installation:
 * Follow the steps of [GAAS](https://gaas.gitbook.io/guide/software-realization-build-your-own-autonomous-drone/build-your-own-autonomous-drone-e01-offboard-control-and-gazebo-simulation) (we will change files of this environment in order to make our properly simulations. 
   * Skip the installation of ROS Melodic 
   * Skip the point 2. Using Docker
-
-## Material
-
-* 1 PC - With Linux 18.04 
-* 1 - [Pixhawk](https://pixhawk.org/) where we will install Linux 18.04
-* 1 - [Raspberry](https://www.raspberrypi.org/)
-* 6 - proppellers
-* 6 - ESC
-* 1 - battery
-* 1 - drone base
-* 6 - motors
-* ... 
 
 ## catkin_ws
 
